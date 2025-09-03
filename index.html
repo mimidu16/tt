@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Widget Horaires</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&family=DM+Sans:wght@500&display=swap');
+
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f7f7f7;
+    }
+
+    .widget {
+      width: 100%;
+      max-width: 430px;
+      height: 360px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fff;
+      font-family: 'Open Sans', sans-serif;
+      color: #172042;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* Centre le contenu verticalement */
+      text-align: center;
+    }
+
+    .widget h2 {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: #172042;
+    }
+
+    .hours {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .status {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    .open {
+      color: #607085;
+    }
+
+    .closed {
+      color: #172042;
+    }
+  </style>
+</head>
+<body>
+  <div class="widget">
+    <h2>Horaires d'ouverture</h2>
+    <div id="hours" class="hours">Chargement…</div>
+    <div id="status" class="status"></div>
+  </div>
+
+  <script>
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_lB-xqc8azKUcUUi6eQm-CvGoQzdxfnzW9hrN9oySai_zo3eTxEjjVYc_NhQ8P8mNTTULnymjN53W/pub?output=csv";
+
+    fetch(sheetUrl)
+      .then(response => response.text())
+      .then(data => {
+        const rows = data.trim().split("\n").map(r => r.split(","));
+        let html = "";
+        const today = new Date();
+        const dayIndex = (today.getDay() + 6) % 7; // lundi=0, dimanche=6
+        const now = today.getHours() * 60 + today.getMinutes();
+
+        let isOpen = false;
+
+        rows.forEach((row, i) => {
+          if (i === 0) return; // skip header
+          const [day, open, close] = row;
+          html += `<div>${day} : ${open} - ${close}</div>`;
+
+          if (i - 1 === dayIndex) {
+            const [oh, om] = open.split(":").map(Number);
+            const [ch, cm] = close.split(":").map(Number);
+            const openMins = oh * 60 + om;
+            const closeMins = ch * 60 + cm;
+            if (now >= openMins && now <= closeMins) {
+              isOpen = true;
+            }
+          }
+        });
+
+        document.getElementById("hours").innerHTML = html;
+        document.getElementById("status").innerHTML = isOpen
+          ? "<span class='open'>*Actuellement ouvert</span>"
+          : "<span class='closed'>*Actuellement fermé</span>";
+      });
+  </script>
+</body>
+</html>
