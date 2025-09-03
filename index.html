@@ -2,34 +2,42 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Widget Horaires</title>
+  <title>Horaires d'ouverture</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&family=DM+Sans:wght@500&display=swap');
 
     body {
-      margin: 0;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 16px;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fb;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 430px;
+      padding: 10px;
+      box-sizing: border-box;
     }
 
     .widget {
       width: 100%;
-      max-width: 430px;
-      height: 360px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      background: #fff;
-      font-family: 'Open Sans', sans-serif;
-      color: #172042;
+      background: white;
+      border: 1px solid #e0e0e0;
       padding: 20px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      justify-content: center; /* Centre le contenu verticalement */
-      text-align: center;
+      justify-content: center;
     }
 
     .widget h2 {
@@ -37,16 +45,34 @@
       font-size: 20px;
       margin-bottom: 15px;
       color: #172042;
+      text-align: center;
     }
 
-    .hours {
-      font-size: 16px;
-      line-height: 1.5;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
     }
 
-    .status {
-      margin-top: 15px;
-      font-weight: bold;
+    tr {
+      display: flex;
+      width: 100%;
+      padding: 4px 0;
+      align-items: center;
+    }
+
+    td:first-child {
+      flex: 1;
+      text-align: left; /* Jour aligné à gauche */
+    }
+
+    td:last-child {
+      flex: 1;
+      text-align: right; /* Horaires alignés à droite */
+    }
+
+    .day {
+      font-weight: 600;
     }
 
     .open {
@@ -56,49 +82,133 @@
     .closed {
       color: #172042;
     }
+
+    .highlight-open {
+      color: green;
+      font-weight: bold;
+    }
+
+    .highlight-closed {
+      color: red;
+      font-weight: bold;
+    }
+
+    .status {
+      text-align: center;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .status.open {
+      color: green;
+    }
+
+    .status.closed {
+      color: red;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .widget {
+        padding: 15px;
+      }
+
+      .widget h2 {
+        font-size: 18px;
+      }
+
+      table {
+        font-size: 14px;
+      }
+
+      tr {
+        flex-direction: column;
+        text-align: center;
+        padding: 6px 0;
+      }
+
+      td {
+        width: 100%;
+        justify-content: center;
+        padding: 2px 0;
+        text-align: center !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="widget">
-    <h2>Horaires d'ouverture</h2>
-    <div id="hours" class="hours">Chargement…</div>
+  <div class="container">
+    <div class="widget">
+      <h2>Horaires d’ouverture</h2>
+      <table id="schedule"></table>
+    </div>
     <div id="status" class="status"></div>
   </div>
 
   <script>
     const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_lB-xqc8azKUcUUi6eQm-CvGoQzdxfnzW9hrN9oySai_zo3eTxEjjVYc_NhQ8P8mNTTULnymjN53W/pub?output=csv";
+    const days = ["DIMANCHE","LUNDI","MARDI","MERCREDI","JEUDI","VENDREDI","SAMEDI"];
 
     fetch(sheetUrl)
-      .then(response => response.text())
-      .then(data => {
-        const rows = data.trim().split("\n").map(r => r.split(","));
-        let html = "";
-        const today = new Date();
-        const dayIndex = (today.getDay() + 6) % 7; // lundi=0, dimanche=6
-        const now = today.getHours() * 60 + today.getMinutes();
-
+      .then(res => res.text())
+      .then(csv => {
+        const rows = csv.split("\n").slice(1);
+        const scheduleTable = document.getElementById("schedule");
+        const now = new Date();
+        const today = days[now.getDay()];
+        const currentTime = now.getHours() * 60 + now.getMinutes();
         let isOpen = false;
 
-        rows.forEach((row, i) => {
-          if (i === 0) return; // skip header
-          const [day, open, close] = row;
-          html += `<div>${day} : ${open} - ${close}</div>`;
+        rows.forEach(row => {
+          const cols = row.split(",");
+          const day = cols[0]?.trim();
+          const hours = cols[1]?.trim();
 
-          if (i - 1 === dayIndex) {
-            const [oh, om] = open.split(":").map(Number);
-            const [ch, cm] = close.split(":").map(Number);
-            const openMins = oh * 60 + om;
-            const closeMins = ch * 60 + cm;
-            if (now >= openMins && now <= closeMins) {
-              isOpen = true;
+          if (!day) return;
+
+          let tr = document.createElement("tr");
+          let tdDay = document.createElement("td");
+          tdDay.textContent = day.charAt(0).toUpperCase() + day.slice(1);
+          tdDay.classList.add("day");
+
+          let tdHours = document.createElement("td");
+          tdHours.textContent = hours;
+
+          if (day.toUpperCase() === today) {
+            if (hours.toLowerCase() !== "fermé") {
+              let [open, close] = hours.split("-").map(h => h.trim());
+              let [openH, openM] = open.split(":").map(Number);
+              let [closeH, closeM] = close.split(":").map(Number);
+              let openMinutes = openH * 60 + openM;
+              let closeMinutes = closeH * 60 + closeM;
+
+              if (currentTime >= openMinutes && currentTime <= closeMinutes) {
+                tdDay.classList.add("highlight-open");
+                tdHours.classList.add("highlight-open");
+                isOpen = true;
+              } else {
+                tdDay.classList.add("highlight-closed");
+                tdHours.classList.add("highlight-closed");
+              }
+            } else {
+              tdDay.classList.add("highlight-closed");
+              tdHours.classList.add("highlight-closed");
             }
           }
+
+          tr.appendChild(tdDay);
+          tr.appendChild(tdHours);
+          scheduleTable.appendChild(tr);
         });
 
-        document.getElementById("hours").innerHTML = html;
-        document.getElementById("status").innerHTML = isOpen
-          ? "<span class='open'>*Actuellement ouvert</span>"
-          : "<span class='closed'>*Actuellement fermé</span>";
+        const status = document.getElementById("status");
+        if (isOpen) {
+          status.textContent = "*actuellement ouvert";
+          status.classList.add("open");
+        } else {
+          status.textContent = "*actuellement fermé";
+          status.classList.add("closed");
+        }
       });
   </script>
 </body>
