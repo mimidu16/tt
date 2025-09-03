@@ -12,24 +12,24 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      width: 490px;       /* Fixe en desktop */
+      height: 359px;      /* Fixe en desktop */
       margin: 0;
       padding: 0;
       background: #f5f7fb;
     }
 
     .widget {
-      width: 490px;         /* Fixe en desktop */
-      height: 359px;        /* Fixe en desktop */
+      width: 100%;   /* prend toujours la largeur de body */
+      height: 100%;  /* prend toujours la hauteur de body */
       background: white;
       border: 1px solid #e0e0e0;
       padding: 30px 20px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
-      margin: 0 auto;
     }
 
     .widget h2 {
@@ -75,7 +75,7 @@
     .status {
       text-align: center;
       font-size: 12px;
-      margin-top: 10px;
+      margin-top: 15px;
     }
 
     .status.open {
@@ -88,11 +88,20 @@
 
     /* Responsive mobile */
     @media (max-width: 520px) {
+      body {
+        width: 100%;        /* s’adapte à l’écran */
+        height: auto;       /* hauteur auto */
+        min-height: 100vh;  /* prend toute la hauteur dispo */
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* contenu aligné en haut */
+      }
+
       .widget {
-        width: 100%;        /* Pleine largeur mobile */
-        height: auto;       /* Hauteur auto */
-        max-width: 490px;   /* Ne dépasse jamais la version desktop */
-        padding: 20px 15px; /* Marges réduites */
+        width: 100%;
+        height: auto;
+        max-width: 490px;   /* ne dépasse pas desktop */
+        padding: 20px 15px;
       }
 
       .widget h2 {
@@ -102,11 +111,9 @@
   </style>
 </head>
 <body>
-  <div>
-    <div class="widget">
-      <h2>Horaires d’ouverture</h2>
-      <table id="schedule"></table>
-    </div>
+  <div class="widget">
+    <h2>Horaires d’ouverture</h2>
+    <table id="schedule"></table>
     <div id="status" class="status"></div>
   </div>
 
