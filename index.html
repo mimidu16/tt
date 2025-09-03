@@ -6,44 +6,37 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400&family=DM+Sans:wght@500&display=swap');
 
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 430px;       /* Largeur fixe */
+      height: 359px;      /* Hauteur fixe */
+      background: white;  /* Même couleur que le widget */
       font-family: 'Open Sans', sans-serif;
       font-size: 16px;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 0;
-      background: #f5f7fb;
-    }
-
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-      max-width: 430px;
-      padding: 10px;
-      box-sizing: border-box;
+      overflow: hidden;   /* Pas de scroll */
     }
 
     .widget {
       width: 100%;
+      height: 100%;
       background: white;
       border: 1px solid #e0e0e0;
-      padding: 20px;
+      padding: 30px 20px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .widget h2 {
       font-family: 'DM Sans', sans-serif;
       font-size: 20px;
-      margin-bottom: 15px;
+      margin: 0 0 20px 0;
       color: #172042;
       text-align: center;
     }
@@ -58,29 +51,16 @@
       display: flex;
       width: 100%;
       padding: 4px 0;
-      align-items: center;
     }
 
     td:first-child {
       flex: 1;
-      text-align: left; /* Jour aligné à gauche */
-    }
-
-    td:last-child {
-      flex: 1;
-      text-align: right; /* Horaires alignés à droite */
-    }
-
-    .day {
+      text-align: left;
       font-weight: 600;
     }
 
-    .open {
-      color: #607085;
-    }
-
-    .closed {
-      color: #172042;
+    td:last-child {
+      text-align: right;
     }
 
     .highlight-open {
@@ -107,41 +87,30 @@
       color: red;
     }
 
-    /* Responsive */
+    /* Version mobile : on garde auto largeur */
     @media (max-width: 480px) {
+      html, body {
+        width: 100%;
+        height: auto;
+      }
+
       .widget {
-        padding: 15px;
+        width: 100%;
+        height: auto;
+        max-width: 430px;
+        padding: 20px 15px;
       }
 
       .widget h2 {
         font-size: 18px;
       }
-
-      table {
-        font-size: 14px;
-      }
-
-      tr {
-        flex-direction: column;
-        text-align: center;
-        padding: 6px 0;
-      }
-
-      td {
-        width: 100%;
-        justify-content: center;
-        padding: 2px 0;
-        text-align: center !important;
-      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="widget">
-      <h2>Horaires d’ouverture</h2>
-      <table id="schedule"></table>
-    </div>
+  <div class="widget">
+    <h2>Horaires d’ouverture</h2>
+    <table id="schedule"></table>
     <div id="status" class="status"></div>
   </div>
 
