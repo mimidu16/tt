@@ -9,25 +9,26 @@
     html, body {
       margin: 0;
       padding: 0;
+      width: 430px;       /* Version desktop fixe */
+      height: 350px;      /* Version desktop fixe */
       background: white;
       font-family: 'Open Sans', sans-serif;
       font-size: 16px;
       display: flex;
       justify-content: center;
-      align-items: flex-start;  /* aligné en haut, plus de vide en bas */
-      min-height: 100vh;        /* occupe la hauteur de l'écran */
+      align-items: center;
     }
 
     .widget {
       width: 100%;
-      max-width: 430px;         /* largeur max */
+      height: 100%;
       background: white;
       border: 1px solid #e0e0e0;
       padding: 30px 20px;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: space-between;
       align-items: center;
     }
 
@@ -85,14 +86,19 @@
       color: red;
     }
 
-    /* Version mobile : prend toute la largeur */
+    /* --- Version mobile responsive --- */
     @media (max-width: 480px) {
-      body {
-        padding: 10px;
+      html, body {
+        width: 100%;         /* prend toute la largeur */
+        height: auto;        /* hauteur auto */
+        min-height: 100vh;   /* occupe l'écran si besoin */
+        align-items: flex-start; /* contenu aligné en haut */
       }
 
       .widget {
         width: 100%;
+        height: auto;
+        max-width: 430px;   /* limite largeur max */
         padding: 20px 15px;
       }
 
